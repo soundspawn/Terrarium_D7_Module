@@ -1,0 +1,80 @@
+<?php
+function terrarium_schema() {
+    $schema['terrarium_schedule'] = array(
+      'description' => 'Temperature and Color Changing Schedule',
+      'fields' => array(
+        'id' => array(
+          'description' => 'UID',
+          'type' => 'serial',
+          'not null' => TRUE,
+        ),
+        'timestamp' => array(
+          'description' => 'Minutes into day for event',
+          'type' => 'int',
+          'unsigned' => TRUE,
+          'not null' => TRUE,
+        ),
+        'change_color' => array(
+          'description' => 'If Event affects color',
+          'type' => 'int',
+          'size' => 'tiny',
+          'not null' => TRUE,
+          'default' => 0,
+        ),
+        'color_change_time' => array(
+          'description' => 'Gradient time (time to change to these colors)',
+          'type' => 'int',
+          'unsigned' => TRUE,
+          'not null' => TRUE,
+          'default' => 0,
+        ),
+        'red' => array(
+          'description' => 'Red Color Value',
+          'type' => 'int',
+          'unsigned' => TRUE,
+          'not null' => TRUE,
+          'default' => 0,
+        ),
+        'green' => array(
+          'description' => 'Green Color Value',
+          'type' => 'int',
+          'unsigned' => TRUE,
+          'not null' => TRUE,
+          'default' => 0,
+        ),
+        'blue' => array(
+          'description' => 'Blue Color Value',
+          'type' => 'int',
+          'unsigned' => TRUE,
+          'not null' => TRUE,
+          'default' => 0,
+        ),
+        'change_temp' => array(
+          'description' => 'If Event affects temperature',
+          'type' => 'int',
+          'size' => 'tiny',
+          'not null' => TRUE,
+          'default' => 0,
+        ),
+        'temperature' => array(
+          'description' => 'Temperature Setting',
+          'type' => 'int',
+          'unsigned' => TRUE,
+          'size' => 'tiny',
+          'not null' => TRUE,
+          'default' => 0,
+        ),
+        'temperature_variance' => array(
+          'description' => 'Temperature Variance',
+          'type' => 'int',
+          'unsigned' => TRUE,
+          'size' => 'tiny',
+          'not null' => TRUE,
+          'default' => 0,
+        ),
+      ),
+      'primary key' => array('id'),
+    );
+
+    return $schema;
+}

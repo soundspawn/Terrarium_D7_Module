@@ -1,0 +1,87 @@
+<?php
+ini_set('display_errors', 1);
+function terrarium_menu(){
+    $items['terrarium/get_time'] = array(
+        'page callback' => 'terrarium_get_time',
+        'delivery callback' => 'true_ajax',
+        'access callback' => true,
+        'type' => MENU_CALLBACK,
+    );
+    return $items;
+}
+
+function terrarium_get_lighting_entry_dumbfire($time){
+    $result = db_select('terrarium_schedule','s')
+    ->fields('s',array(
+        'timestamp',
+        'color_change_time',
+        'red',
+        'green',
+        'blue',
+    ))
+    ->condition('timestamp',$time,'<=')
+    ->condition('change_color',1)
+    ->orderBy('timestamp','DESC')
+    ->range(0,1)
+    ->execute()
+    ->fetchAssoc();
+    return $result;
+}
+function terrarium_get_lighting_entry($time){
+    $r = terrarium_get_lighting_entry_dumbfire($time);
+    if(empty($r)){
+        $r = terrarium_get_lighting_entry_dumbfire(24*60);
+    }
+    return $r;
+}
+
+function terrarium_get_lighting_information($time){
+    $return = array();
+
+    $r = terrarium_get_lighting_entry($time);
+    $t = 0;
+    $transition = ($time - $r['color_change_time']/1000/60);
+    if($transition < 0){
+        $transition += (24*60);
+    }
+    if($transition < $r['timestamp'] && $time >= $r['timestamp']){
+        //We're in the middle of a transition
+        $t = terrarium_get_lighting_entry($r['timestamp']-1);
+    }
+    $return = array_merge($return,array(
+        'red' => (int)$r['red'],
+        'green' => (int)$r['green'],
+        'blue' => (int)$r['blue'],
+    ));
+    if(!empty($t)){
+        $return = array_merge($return,array(
+            'red' => (int)$t['red'],
+            'green' => (int)$t['green'],
+            'blue' => (int)$t['blue'],
+            'gradient' => 1,
+            'gRed' => (int)$r['red'],
+            'gGreen' => (int)$r['green'],
+            'gBlue' => (int)$r['blue'],
+            'gTime' => (int)$r['color_change_time'],
+            'cbt' => (int)$r['color_change_time']+20000,
+        ));
+    }
+    return $return;
+}
+
+function terrarium_get_time(){
+    $time = strtotime('now');
+    $data = terrarium_get_lighting_information(date('G',$time)*60+intval(date('i',$time)));
+    $options = array(
+        'result' => true,
+        'now' => $time,
+        'cbt' => 300000,
+        'temp' => 78,
+        'var' => 3,
+    );
+
+    $data = array_merge($options,$data);
+
+    return $data;
+}
+

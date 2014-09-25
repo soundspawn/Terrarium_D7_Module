@@ -1,0 +1,6 @@
+name = Terrarium Communicator
+description = Commands the remote Terrarium controller will interface with
+core = 7.x
+package = Willett AVT
+
+files[] = terrarium.module
